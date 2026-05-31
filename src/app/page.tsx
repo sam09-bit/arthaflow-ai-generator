@@ -1,65 +1,102 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useState } from 'react';
+import { FileText, Loader2 } from 'lucide-react';
+import UploadDropzone from '@/components/documents/UploadDropzone';
+import VerificationForm from '@/components/documents/VerificationForm';
+import SuccessVault from '@/components/documents/SuccessVault';
+
+export type DocType = 'proforma' | 'packing_list' | 'hs_code';
+
+export default function DocumentGeneratorPage() {
+  const [step, setStep] = useState<'UPLOAD' | 'PROCESSING' | 'VERIFY' | 'SUCCESS'>('UPLOAD');
+  const [docType, setDocType] = useState<DocType>('proforma');
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [extractedData, setExtractedData] = useState<any>(null);
+
+  const handleFileUpload = async (fileUrl: string) => {
+    setUploadedImage(fileUrl);
+    setStep('PROCESSING');
+    
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      
+      reader.onloadend = async () => {
+        const base64data = (reader.result as string).split(',')[1];
+        const apiRes = await fetch('/api/documents/extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64: base64data, docType })
+        });
+
+        if (!apiRes.ok) throw new Error('API request failed');
+
+        const extractedJson = await apiRes.json();
+        setExtractedData(extractedJson);
+        setStep('VERIFY');
+      };
+    } catch (error) {
+      console.error("Extraction failed:", error);
+      alert("Failed to extract data.");
+      setStep('UPLOAD');
+    }
+  };
+
+  const handleReset = () => {
+    setStep('UPLOAD');
+    setUploadedImage(null);
+    setExtractedData(null);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="min-h-screen bg-zinc-50 text-zinc-900 font-sans p-6 md:p-12 flex flex-col items-center">
+      <div className="max-w-3xl w-full mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 flex items-center gap-3">
+          <FileText className="text-blue-600 h-8 w-8" />
+          ArthaFlow AI Generator
+        </h1>
+        <p className="text-zinc-500 mt-2">Upload rough spec sheets or photos to generate customs documents.</p>
+      </div>
+
+      <div className="max-w-3xl w-full bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden min-h-100">
+        {step === 'UPLOAD' && (
+          <div className="p-8 pb-0">
+            <div className="flex flex-wrap justify-center gap-2 p-1 bg-zinc-100 rounded-xl mb-4 w-fit mx-auto border border-zinc-200">
+              <button onClick={() => setDocType('proforma')} className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${docType === 'proforma' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500 hover:text-zinc-700'}`}>
+                Proforma Invoice
+              </button>
+              <button onClick={() => setDocType('packing_list')} className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${docType === 'packing_list' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500 hover:text-zinc-700'}`}>
+                Packing List
+              </button>
+              <button onClick={() => setDocType('hs_code')} className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${docType === 'hs_code' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500 hover:text-zinc-700'}`}>
+                HS Code Finder
+              </button>
+            </div>
+            <UploadDropzone onUpload={handleFileUpload} />
+          </div>
+        )}
+
+        {step === 'PROCESSING' && (
+          <div className="p-12 flex flex-col items-center justify-center text-center animate-in fade-in h-full min-h-100">
+            <Loader2 className="h-10 w-10 text-blue-600 animate-spin mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Vision AI is reading...</h3>
+            <p className="text-zinc-500 text-sm">
+              {docType === 'hs_code' ? 'Analyzing product image for HS Classification...' : `Extracting ${docType === 'proforma' ? 'Invoice' : 'Packing'} details.`}
+            </p>
+          </div>
+        )}
+
+        {step === 'VERIFY' && (
+          <VerificationForm data={extractedData} image={uploadedImage} docType={docType} onConfirm={() => setStep('SUCCESS')} />
+        )}
+
+        {step === 'SUCCESS' && (
+          <SuccessVault onReset={handleReset} data={extractedData} docType={docType} />
+        )}
+      </div>
     </div>
   );
 }
