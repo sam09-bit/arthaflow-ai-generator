@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Document Generator — ArthaFlow Global</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   ArthaFlow Global — Design Tokens
+   Brand palette extracted from arthaflow.com main site
+   ───────────────────────────────────────────────────────────────────────── */
+:root{
+  /* Navy spectrum (primary background) */
+  --navy-950:#070F26;
+  --navy-900:#0A1633;
+  --navy-800:#0F1D44;
+  --navy-700:#152558;
+  --navy-600:#1F2D6E;
+  --navy-line:#1F2D52;
+
+  /* Gold (signature brand accent) */
+  --gold-500:#E5B547;
+  --gold-600:#D4A53C;
+  --gold-400:#EFC669;
+  --gold-50:#FDF7E4;
+
+  /* Blue (secondary CTAs) */
+  --blue-500:#3B82F6;
+  --blue-600:#2563EB;
+  --blue-100:#DBEAFE;
+
+  /* Success / status colors */
+  --green-500:#10B981;
+  --green-50:#ECFDF5;
+  --green-200:#A7F3D0;
+
+  --amber-500:#F59E0B;
+  --amber-50:#FFFBEB;
+  --amber-200:#FDE68A;
+
+  --red-500:#EF4444;
+
+  /* Neutrals */
+  --white:#FFFFFF;
+  --slate-50:#F8FAFC;
+  --slate-100:#F1F5F9;
+  --slate-200:#E2E8F0;
+  --slate-300:#CBD5E1;
+  --slate-400:#94A3B8;
+  --slate-500:#64748B;
+  --slate-600:#475569;
+  --slate-700:#334155;
+  --slate-900:#0F172A;
+
+  /* Typography */
+  --font-sans:'Inter',system-ui,-apple-system,sans-serif;
+  --font-display:'Plus Jakarta Sans','Inter',system-ui,sans-serif;
+
+  /* Radii */
+  --r-sm:8px;
+  --r-md:12px;
+  --r-lg:16px;
+  --r-xl:20px;
+  --r-pill:999px;
+
+  /* Shadows */
+  --shadow-card:0 1px 3px rgba(7,15,38,.08), 0 1px 2px rgba(7,15,38,.04);
+  --shadow-card-hover:0 10px 30px rgba(7,15,38,.12);
+  --shadow-glow:0 0 0 4px rgba(229,181,71,.15);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-sans);
+  background:var(--slate-50);
+  color:var(--slate-900);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Top Navigation (matches main arthaflow.com nav)
+   ───────────────────────────────────────────────────────────────────────── */
+.nav{
+  background:var(--navy-900);
+  border-bottom:1px solid var(--navy-line);
+  position:sticky;top:0;z-index:50;
+}
+.nav-inner{
+  max-width:1280px;margin:0 auto;
+  padding:18px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.brand{
+  font-family:var(--font-display);
+  font-weight:800;font-size:22px;
+  color:var(--white);
+  letter-spacing:-0.02em;
+  text-decoration:none;
+  display:inline-flex;align-items:center;gap:2px;
+}
+.brand-flow{color:var(--gold-500);}
+.nav-links{
+  display:flex;gap:36px;align-items:center;
+  list-style:none;
+}
+.nav-links a{
+  color:var(--slate-300);
+  text-decoration:none;
+  font-size:14px;font-weight:500;
+  transition:color .15s;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--white);}
+.nav-actions{display:flex;gap:12px;align-items:center;}
+.nav-user{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 14px 6px 6px;
+  background:var(--navy-800);
+  border:1px solid var(--navy-line);
+  border-radius:var(--r-pill);
+  color:var(--white);
+  font-size:13px;font-weight:500;
+  cursor:pointer;
+}
+.nav-user-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-500),var(--gold-600));
+  color:var(--navy-900);
+  display:grid;place-items:center;
+  font-weight:700;font-size:12px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Page Header
+   ───────────────────────────────────────────────────────────────────────── */
+.page-header{
+  background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%);
+  color:var(--white);
+  padding:48px 32px 88px;
+  position:relative;overflow:hidden;
+}
+.page-header::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(229,181,71,.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(59,130,246,.06) 0%, transparent 50%);
+  pointer-events:none;
+}
+.page-header-inner{
+  max-width:1280px;margin:0 auto;
+  position:relative;z-index:1;
+}
+.breadcrumb{
+  display:flex;align-items:center;gap:8px;
+  color:var(--slate-400);
+  font-size:13px;font-weight:500;
+  margin-bottom:20px;
+}
+.breadcrumb a{color:var(--slate-400);text-decoration:none;transition:color .15s;}
+.breadcrumb a:hover{color:var(--white);}
+.breadcrumb-current{color:var(--white);}
+.eyebrow{
+  color:var(--blue-500);
+  font-size:12px;font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+.page-title{
+  font-family:var(--font-display);
+  font-size:42px;font-weight:800;
+  letter-spacing:-0.02em;line-height:1.1;
+  margin-bottom:12px;
+}
+.page-title .accent{color:var(--gold-500);}
+.page-subtitle{
+  color:var(--slate-300);
+  font-size:17px;max-width:680px;
+  line-height:1.55;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Main layout: stage + sidebar
+   ───────────────────────────────────────────────────────────────────────── */
+.app-shell{
+  max-width:1280px;margin:-64px auto 64px;
+  padding:0 32px;
+  position:relative;z-index:2;
+  display:grid;
+  grid-template-columns:1fr 340px;
+  gap:24px;
+  align-items:start;
+}
+@media (max-width:1024px){
+  .app-shell{grid-template-columns:1fr;}
+}
+
+.stage{
+  background:var(--white);
+  border:1px solid var(--slate-200);
+  border-radius:var(--r-xl);
+  box-shadow:var(--shadow-card);
+  overflow:hidden;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Step indicator
+   ───────────────────────────────────────────────────────────────────────── */
+.stepper{
+  display:flex;align-items:center;
+  padding:24px 32px;
+  border-bottom:1px solid var(--slate-200);
+  gap:8px;
+}
+.step{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:600;
+  color:var(--slate-400);
+  flex:1;
+}
+.step.done{color:var(--green-500);}
+.step.active{color:var(--navy-900);}
+.step-num{
+  width:28px;height:28px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--slate-100);color:var(--slate-400);
+  font-weight:700;font-size:13px;
+  border:1.5px solid var(--slate-200);
+  flex-shrink:0;
+}
+.step.active .step-num{
+  background:var(--navy-900);color:var(--white);
+  border-color:var(--navy-900);
+}
+.step.done .step-num{
+  background:var(--green-500);color:var(--white);
+  border-color:var(--green-500);
+}
+.step-divider{
+  flex:1;height:2px;
+  background:var(--slate-200);
+  position:relative;
+}
+.step.done + .step-divider{background:var(--green-500);}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Doc-type tabs
+   ───────────────────────────────────────────────────────────────────────── */
+.doctype-tabs{
+  display:flex;gap:10px;flex-wrap:wrap;
+  padding:32px 32px 0;
+  margin-bottom:8px;
+}
+.doctype-tab{
+  flex:1;min-width:200px;
+  background:var(--white);
+  border:1.5px solid var(--slate-200);
+  border-radius:var(--r-md);
+  padding:18px 18px;
+  cursor:pointer;
+  text-align:left;
+  display:flex;align-items:flex-start;gap:14px;
+  transition:all .15s;
+  font-family:inherit;
+}
+.doctype-tab:hover{border-color:var(--navy-700);background:var(--slate-50);}
+.doctype-tab.selected{
+  border-color:var(--navy-900);
+  background:var(--navy-900);
+  color:var(--white);
+}
+.doctype-tab.selected .doctype-meta{color:var(--slate-300);}
+.doctype-icon{
+  width:40px;height:40px;flex-shrink:0;
+  background:var(--gold-50);
+  color:var(--gold-600);
+  border-radius:var(--r-sm);
+  display:grid;place-items:center;
+}
+.doctype-tab.selected .doctype-icon{
+  background:rgba(229,181,71,.2);color:var(--gold-500);
+}
+.doctype-name{
+  font-weight:700;font-size:14px;
+  margin-bottom:2px;
+}
+.doctype-meta{
+  font-size:12px;color:var(--slate-500);
+  font-weight:500;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Dropzone (Step 1)
+   ───────────────────────────────────────────────────────────────────────── */
+.stage-body{padding:32px;}
+.dropzone{
+  border:2px dashed var(--slate-300);
+  background:var(--slate-50);
+  border-radius:var(--r-lg);
+  padding:48px 32px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .2s;
+}
+.dropzone:hover{
+  border-color:var(--gold-500);
+  background:var(--gold-50);
+}
+.dropzone-icon{
+  width:64px;height:64px;
+  background:var(--white);
+  border:1px solid var(--slate-200);
+  border-radius:50%;
+  display:grid;place-items:center;
+  margin:0 auto 18px;
+  color:var(--navy-700);
+  box-shadow:var(--shadow-card);
+}
+.dropzone-title{
+  font-family:var(--font-display);
+  font-size:20px;font-weight:700;
+  color:var(--navy-900);
+  margin-bottom:6px;
+}
+.dropzone-subtitle{
+  color:var(--slate-500);font-size:14px;
+  max-width:380px;margin:0 auto 28px;line-height:1.55;
+}
+.dropzone-actions{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Buttons (ArthaFlow primary + secondary patterns)
+   ───────────────────────────────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 22px;
+  border-radius:var(--r-pill);
+  font-family:inherit;font-size:14px;font-weight:600;
+  text-decoration:none;border:none;cursor:pointer;
+  transition:transform .12s,box-shadow .15s,background .15s;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+
+/* gold = primary CTA (matches "Start Exporting Free" on main site) */
+.btn-primary{
+  background:var(--gold-500);
+  color:var(--navy-900);
+}
+.btn-primary:hover{background:var(--gold-600);box-shadow:var(--shadow-glow);}
+
+/* blue = secondary CTA (matches "Get Started Free") */
+.btn-secondary{
+  background:var(--blue-500);
+  color:var(--white);
+}
+.btn-secondary:hover{background:var(--blue-600);}
+
+/* outline on dark */
+.btn-outline-dark{
+  background:transparent;
+  color:var(--white);
+  border:1.5px solid rgba(255,255,255,.25);
+}
+.btn-outline-dark:hover{border-color:var(--white);background:rgba(255,255,255,.05);}
+
+/* outline on light */
+.btn-outline{
+  background:var(--white);
+  color:var(--navy-900);
+  border:1.5px solid var(--slate-200);
+}
+.btn-outline:hover{border-color:var(--navy-900);}
+
+.btn-dark{
+  background:var(--navy-900);
+  color:var(--white);
+}
+.btn-dark:hover{background:var(--navy-800);}
+
+.btn-ghost{
+  background:transparent;color:var(--slate-700);
+}
+.btn-ghost:hover{background:var(--slate-100);}
+
+.btn-lg{padding:14px 28px;font-size:15px;}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Trust signals row (under dropzone)
+   ───────────────────────────────────────────────────────────────────────── */
+.trust-row{
+  display:flex;justify-content:center;gap:32px;flex-wrap:wrap;
+  margin-top:36px;padding-top:28px;
+  border-top:1px solid var(--slate-200);
+  color:var(--slate-500);
+  font-size:12px;font-weight:500;
+}
+.trust-item{display:flex;align-items:center;gap:8px;}
+.trust-item svg{color:var(--green-500);}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Processing state (Step 2)
+   ───────────────────────────────────────────────────────────────────────── */
+.processing{
+  padding:80px 32px;text-align:center;
+}
+.processing-spinner{
+  width:72px;height:72px;
+  border:4px solid var(--slate-200);
+  border-top-color:var(--gold-500);
+  border-radius:50%;
+  margin:0 auto 24px;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.processing-title{
+  font-family:var(--font-display);
+  font-size:22px;font-weight:700;
+  color:var(--navy-900);margin-bottom:8px;
+}
+.processing-subtitle{
+  color:var(--slate-500);font-size:14px;margin-bottom:32px;
+}
+.processing-steps{
+  max-width:380px;margin:0 auto;text-align:left;
+  background:var(--slate-50);
+  border:1px solid var(--slate-200);
+  border-radius:var(--r-md);
+  padding:18px;
+}
+.processing-step{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 0;font-size:13px;color:var(--slate-700);
+}
+.processing-step.done{color:var(--green-500);font-weight:600;}
+.processing-step.active{color:var(--navy-900);font-weight:600;}
+.processing-step .dot{
+  width:18px;height:18px;border-radius:50%;
+  display:grid;place-items:center;flex-shrink:0;
+  background:var(--slate-200);color:var(--white);
+  font-size:10px;font-weight:700;
+}
+.processing-step.done .dot{background:var(--green-500);}
+.processing-step.active .dot{
+  background:var(--gold-500);color:var(--navy-900);
+  animation:pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(229,181,71,.4);}
+  50%{box-shadow:0 0 0 8px rgba(229,181,71,0);}
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Verify state (Step 3) — split layout
+   ───────────────────────────────────────────────────────────────────────── */
+.verify{
+  display:grid;
+  grid-template-columns:300px 1fr;
+}
+@media (max-width:900px){.verify{grid-template-columns:1fr;}}
+
+.verify-source{
+  background:var(--slate-50);
+  border-right:1px solid var(--slate-200);
+  padding:24px;
+}
+.verify-source h4{
+  font-size:11px;font-weight:700;
+  color:var(--slate-500);
+  letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.verify-source-img{
+  width:100%;aspect-ratio:3/4;
+  background:linear-gradient(135deg,var(--slate-100),var(--slate-200));
+  border:1px solid var(--slate-200);
+  border-radius:var(--r-md);
+  display:grid;place-items:center;
+  color:var(--slate-400);
+  font-size:13px;font-weight:500;
+  position:relative;overflow:hidden;
+  margin-bottom:14px;
+}
+.verify-source-img::after{
+  content:'INV-2026-8821.jpg';
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(7,15,38,.85);color:var(--white);
+  padding:8px 12px;font-size:11px;
+  font-family:ui-monospace,'SF Mono',monospace;
+}
+.verify-source-meta{
+  font-size:12px;color:var(--slate-500);
+}
+.verify-source-meta div{margin-bottom:4px;}
+.verify-source-meta strong{color:var(--slate-700);font-weight:600;}
+
+.verify-form{padding:28px 32px;}
+.verify-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;margin-bottom:24px;
+}
+.verify-header h2{
+  font-family:var(--font-display);
+  font-size:22px;font-weight:700;
+  color:var(--navy-900);margin-bottom:4px;
+}
+.verify-header p{
+  color:var(--slate-500);font-size:14px;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;
+  border-radius:var(--r-pill);
+  font-size:11px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;
+  background:var(--blue-100);color:var(--blue-600);
+  border:1px solid rgba(59,130,246,.2);
+}
+
+/* form fields */
+.field-grid{
+  display:grid;gap:18px;
+  grid-template-columns:1fr;
+}
+.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.field-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+@media (max-width:640px){
+  .field-row-2,.field-row-4{grid-template-columns:1fr;}
+}
+.field label{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:13px;font-weight:600;color:var(--slate-700);
+  margin-bottom:6px;
+}
+.field input,.field textarea{
+  width:100%;
+  padding:10px 14px;
+  font-family:inherit;font-size:14px;
+  border-radius:var(--r-sm);
+  border:1.5px solid var(--slate-200);
+  background:var(--white);
+  color:var(--slate-900);
+  transition:border-color .12s, background .12s;
+}
+.field input:focus,.field textarea:focus{
+  outline:none;border-color:var(--navy-700);
+  box-shadow:0 0 0 3px rgba(15,29,68,.08);
+}
+.field.confidence-high input{background:var(--green-50);border-color:var(--green-200);}
+.field.confidence-low input{background:var(--amber-50);border-color:var(--amber-200);}
+
+.conf-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:var(--r-pill);
+  font-size:11px;font-weight:700;
+}
+.conf-pill.high{background:var(--green-50);color:#047857;}
+.conf-pill.low{background:var(--amber-50);color:#B45309;}
+
+.verify-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:32px;padding-top:24px;
+  border-top:1px solid var(--slate-200);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Success state (Step 4)
+   ───────────────────────────────────────────────────────────────────────── */
+.success{padding:60px 32px;text-align:center;}
+.success-icon{
+  width:88px;height:88px;border-radius:50%;
+  background:radial-gradient(circle,var(--green-50),var(--white));
+  border:3px solid var(--green-200);
+  margin:0 auto 24px;
+  display:grid;place-items:center;color:var(--green-500);
+}
+.success h2{
+  font-family:var(--font-display);
+  font-size:30px;font-weight:800;
+  color:var(--navy-900);margin-bottom:10px;
+  letter-spacing:-0.02em;
+}
+.success p{
+  color:var(--slate-500);max-width:480px;margin:0 auto 32px;
+  font-size:15px;line-height:1.6;
+}
+.success-doc-preview{
+  display:inline-flex;align-items:center;gap:16px;
+  background:var(--slate-50);
+  border:1px solid var(--slate-200);
+  border-radius:var(--r-md);
+  padding:16px 22px;
+  margin-bottom:28px;
+}
+.success-doc-thumb{
+  width:48px;height:60px;
+  background:var(--white);
+  border:1px solid var(--slate-200);
+  border-radius:6px;
+  display:grid;place-items:center;
+  color:var(--navy-700);
+}
+.success-doc-info{text-align:left;}
+.success-doc-info strong{
+  display:block;color:var(--navy-900);font-size:14px;font-weight:700;
+  margin-bottom:2px;
+}
+.success-doc-info span{
+  color:var(--slate-500);font-size:12px;
+  font-family:ui-monospace,'SF Mono',monospace;
+}
+.success-actions{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:28px;
+}
+.success-reset{
+  background:transparent;border:none;
+  color:var(--blue-500);font-weight:600;font-size:14px;
+  cursor:pointer;font-family:inherit;
+}
+.success-reset:hover{color:var(--blue-600);text-decoration:underline;}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Sidebar (vault + manufacturer profile)
+   ───────────────────────────────────────────────────────────────────────── */
+.sidebar{display:grid;gap:16px;}
+
+.profile-card{
+  background:var(--navy-900);
+  color:var(--white);
+  border-radius:var(--r-xl);
+  padding:20px;
+  position:relative;overflow:hidden;
+}
+.profile-card::before{
+  content:'';position:absolute;top:-20px;right:-20px;
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,rgba(229,181,71,.18),transparent 70%);
+}
+.profile-head{
+  display:flex;align-items:center;gap:12px;margin-bottom:16px;
+  position:relative;
+}
+.profile-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-500),var(--gold-600));
+  color:var(--navy-900);
+  display:grid;place-items:center;
+  font-weight:700;font-size:16px;
+}
+.profile-name{font-size:14px;font-weight:700;}
+.profile-meta{font-size:11px;color:var(--slate-400);font-family:ui-monospace,monospace;}
+.profile-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  position:relative;
+}
+.profile-stat{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--r-sm);
+  padding:10px 12px;
+}
+.profile-stat-num{
+  font-family:var(--font-display);
+  font-size:22px;font-weight:800;
+  color:var(--gold-500);
+}
+.profile-stat-label{
+  font-size:10px;color:var(--slate-400);
+  letter-spacing:.08em;text-transform:uppercase;
+  font-weight:600;
+}
+
+/* vault */
+.vault{
+  background:var(--white);
+  border:1px solid var(--slate-200);
+  border-radius:var(--r-xl);
+  overflow:hidden;
+}
+.vault-head{
+  padding:18px 20px;
+  border-bottom:1px solid var(--slate-200);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.vault-head h3{
+  font-family:var(--font-display);
+  font-size:15px;font-weight:700;color:var(--navy-900);
+}
+.vault-head a{
+  font-size:12px;color:var(--blue-500);
+  text-decoration:none;font-weight:600;
+}
+.vault-list{padding:8px;}
+.vault-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px;border-radius:var(--r-sm);
+  cursor:pointer;transition:background .12s;
+}
+.vault-item:hover{background:var(--slate-50);}
+.vault-thumb{
+  width:36px;height:46px;
+  background:linear-gradient(135deg,var(--slate-100),var(--slate-200));
+  border:1px solid var(--slate-200);
+  border-radius:5px;
+  display:grid;place-items:center;
+  color:var(--slate-500);flex-shrink:0;
+}
+.vault-thumb.proforma{background:linear-gradient(135deg,var(--gold-50),#FCE9A9);color:var(--gold-600);border-color:var(--gold-200,#FACC15);}
+.vault-thumb.packing{background:linear-gradient(135deg,#DBEAFE,#BFDBFE);color:var(--blue-600);}
+.vault-thumb.hs{background:linear-gradient(135deg,#ECFDF5,#A7F3D0);color:#047857;}
+.vault-info{flex:1;min-width:0;}
+.vault-name{
+  font-size:13px;font-weight:600;color:var(--navy-900);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.vault-meta{
+  font-size:11px;color:var(--slate-500);
+  margin-top:2px;
+  display:flex;align-items:center;gap:6px;
+}
+.vault-status{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--green-500);
+}
+.vault-status.pending{background:var(--amber-500);}
+
+/* AI status card */
+.ai-status{
+  background:linear-gradient(135deg,var(--navy-900),var(--navy-700));
+  color:var(--white);
+  border-radius:var(--r-xl);
+  padding:18px 20px;
+  position:relative;overflow:hidden;
+}
+.ai-status::before{
+  content:'';position:absolute;top:0;right:0;
+  width:80px;height:80px;
+  background:radial-gradient(circle,rgba(229,181,71,.2),transparent 70%);
+  pointer-events:none;
+}
+.ai-status-row{
+  display:flex;align-items:center;gap:10px;
+  font-size:12px;color:var(--slate-300);margin-bottom:4px;
+}
+.ai-status-row strong{color:var(--white);font-weight:600;}
+.ai-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green-500);
+  box-shadow:0 0 0 4px rgba(16,185,129,.2);
+  animation:pulse-green 2s ease-in-out infinite;
+}
+@keyframes pulse-green{
+  0%,100%{box-shadow:0 0 0 4px rgba(16,185,129,.2);}
+  50%{box-shadow:0 0 0 8px rgba(16,185,129,0);}
+}
+.ai-status-model{
+  font-family:ui-monospace,'SF Mono',monospace;
+  font-size:13px;color:var(--gold-500);
+  margin-top:4px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Footer
+   ───────────────────────────────────────────────────────────────────────── */
+footer{
+  background:var(--navy-950);
+  color:var(--slate-400);
+  padding:32px;text-align:center;
+  font-size:13px;
+  border-top:1px solid var(--navy-line);
+}
+footer .brand{font-size:18px;margin-bottom:10px;}
+footer a{color:var(--slate-300);text-decoration:none;margin:0 12px;}
+footer a:hover{color:var(--white);}
+
+/* utilities */
+.hidden{display:none !important;}
+
+</style>
+</head>
+<body>
+
+<!-- ════════════ TOP NAV ════════════ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="brand">Artha<span class="brand-flow">Flow</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="#" class="active">Documents</a></li>
+      <li><a href="#">Buyers</a></li>
+      <li><a href="#">Shipments</a></li>
+      <li><a href="#">Vault</a></li>
+    </ul>
+    <div class="nav-actions">
+      <div class="nav-user">
+        <div class="nav-user-avatar">SW</div>
+        <span>Sarthak W.</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════ PAGE HEADER ════════════ -->
+<header class="page-header">
+  <div class="page-header-inner">
+    <div class="breadcrumb">
+      <a href="#">Dashboard</a>
+      <span>›</span>
+      <a href="#">Documents</a>
+      <span>›</span>
+      <span class="breadcrumb-current">AI Generator</span>
+    </div>
+    <div class="eyebrow">AI Documentation Pipeline · v2.0</div>
+    <h1 class="page-title">AI Document <span class="accent">Generator</span></h1>
+    <p class="page-subtitle">
+      Upload a spec sheet, a product photo, or an old invoice — and get
+      customs-grade export documents in under 60 seconds. Vision-powered,
+      manufacturer-aware, internationally compliant.
+    </p>
+  </div>
+</header>
+
+<!-- ════════════ MAIN APP SHELL ════════════ -->
+<main class="app-shell">
+
+  <!-- ──────── STAGE ──────── -->
+  <section class="stage">
+
+    <!-- step indicator -->
+    <div class="stepper">
+      <div class="step done" data-step="upload">
+        <span class="step-num">✓</span>
+        <span>Choose Document</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step done" data-step="processing">
+        <span class="step-num">✓</span>
+        <span>AI Extraction</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step active" data-step="verify">
+        <span class="step-num">3</span>
+        <span>Verify Data</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step" data-step="success">
+        <span class="step-num">4</span>
+        <span>Download</span>
+      </div>
+    </div>
+
+    <!-- ════════════ STATE: UPLOAD ════════════ -->
+    <div id="state-upload" class="hidden">
+
+      <!-- doc type picker -->
+      <div class="doctype-tabs">
+        <button class="doctype-tab selected" data-type="proforma">
+          <div class="doctype-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+          </div>
+          <div>
+            <div class="doctype-name">Proforma Invoice</div>
+            <div class="doctype-meta">Quote for international buyer</div>
+          </div>
+        </button>
+        <button class="doctype-tab" data-type="packing_list">
+          <div class="doctype-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </div>
+          <div>
+            <div class="doctype-name">Packing List</div>
+            <div class="doctype-meta">Shipment details · weights · CBM</div>
+          </div>
+        </button>
+        <button class="doctype-tab" data-type="hs_code">
+          <div class="doctype-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div>
+            <div class="doctype-name">HS Code Finder</div>
+            <div class="doctype-meta">Classify product → 8-digit code</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="stage-body">
+        <div class="dropzone" onclick="goToStep('processing')">
+          <div class="dropzone-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <h3 class="dropzone-title">Drag &amp; Drop or Browse</h3>
+          <p class="dropzone-subtitle">
+            Upload spec sheets, product photos, engineering drawings, or existing
+            invoices. JPG · PNG · HEIC · PDF · Max 10 MB.
+          </p>
+          <div class="dropzone-actions">
+            <button class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Browse Files
+            </button>
+            <button class="btn btn-outline">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Take Photo
+            </button>
+          </div>
+        </div>
+
+        <div class="trust-row">
+          <div class="trust-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Customs-grade output
+          </div>
+          <div class="trust-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            WCO HS 2022 nomenclature
+          </div>
+          <div class="trust-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Encrypted in transit
+          </div>
+          <div class="trust-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Avg. 30s generation
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ STATE: PROCESSING ════════════ -->
+    <div id="state-processing" class="hidden">
+      <div class="processing">
+        <div class="processing-spinner"></div>
+        <h3 class="processing-title">Vision AI is reading your document…</h3>
+        <p class="processing-subtitle">This typically takes 8–15 seconds.</p>
+        <div class="processing-steps">
+          <div class="processing-step done">
+            <span class="dot">✓</span>
+            <span>Image uploaded · 1.2 MB</span>
+          </div>
+          <div class="processing-step done">
+            <span class="dot">✓</span>
+            <span>Quality check passed · 1080×1920</span>
+          </div>
+          <div class="processing-step active">
+            <span class="dot">3</span>
+            <span>Extracting fields via DeepSeek V4 Vision…</span>
+          </div>
+          <div class="processing-step">
+            <span class="dot">4</span>
+            <span>Validating extracted data</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ STATE: VERIFY ════════════ -->
+    <div id="state-verify">
+      <div class="verify">
+
+        <!-- left: source image preview -->
+        <div class="verify-source">
+          <h4>Source Image</h4>
+          <div class="verify-source-img">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="verify-source-meta">
+            <div><strong>Type:</strong> Existing Invoice</div>
+            <div><strong>Resolution:</strong> 1080 × 1920</div>
+            <div><strong>Size:</strong> 1.24 MB</div>
+            <div><strong>Confidence:</strong> 92%</div>
+          </div>
+        </div>
+
+        <!-- right: form -->
+        <div class="verify-form">
+          <div class="verify-header">
+            <div>
+              <h2>Verify Extracted Data</h2>
+              <p>Review the AI output. Amber fields need a second look.</p>
+            </div>
+            <span class="badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+              Proforma Invoice
+            </span>
+          </div>
+
+          <div class="field-grid">
+            <div class="field confidence-high">
+              <label>Buyer Name <span class="conf-pill high">✓ 98%</span></label>
+              <input type="text" value="Global Trade Partners LLC" />
+            </div>
+
+            <div class="field-row-2">
+              <div class="field confidence-high">
+                <label>Document No. <span class="conf-pill high">✓ 95%</span></label>
+                <input type="text" value="INV-2026-8821" />
+              </div>
+              <div class="field confidence-high">
+                <label>Date <span class="conf-pill high">✓ 92%</span></label>
+                <input type="date" value="2026-05-28" />
+              </div>
+            </div>
+
+            <div class="field-row-2">
+              <div class="field confidence-high">
+                <label>HS Code <span class="conf-pill high">✓ 99%</span></label>
+                <input type="text" value="8517.62.00" />
+              </div>
+              <div class="field confidence-low">
+                <label>Total Value (USD) <span class="conf-pill low">⚠ 65%</span></label>
+                <input type="number" value="45250.00" />
+              </div>
+            </div>
+          </div>
+
+          <div class="verify-footer">
+            <button class="btn btn-ghost" onclick="goToStep('upload')">← Back</button>
+            <button class="btn btn-primary btn-lg" onclick="goToStep('success')">
+              Confirm &amp; Generate PDF
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ STATE: SUCCESS ════════════ -->
+    <div id="state-success" class="hidden">
+      <div class="success">
+        <div class="success-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>Your document is ready</h2>
+        <p>
+          We've mapped the data to a customs-compliant Proforma Invoice template
+          and saved it to your vault. WhatsApp notification sent.
+        </p>
+
+        <div class="success-doc-preview">
+          <div class="success-doc-thumb">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="success-doc-info">
+            <strong>Proforma_Invoice_INV-2026-8821.pdf</strong>
+            <span>AF-PI-20260601-0042 · 1 page · 218 KB</span>
+          </div>
+        </div>
+
+        <div class="success-actions">
+          <button class="btn btn-primary btn-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download PDF
+          </button>
+          <button class="btn btn-secondary btn-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Send to Buyer
+          </button>
+          <button class="btn btn-outline btn-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            View in Vault
+          </button>
+        </div>
+
+        <button class="success-reset" onclick="goToStep('upload')">+ Generate another document</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ──────── SIDEBAR ──────── -->
+  <aside class="sidebar">
+
+    <!-- profile / company card -->
+    <div class="profile-card">
+      <div class="profile-head">
+        <div class="profile-avatar">AG</div>
+        <div>
+          <div class="profile-name">ArthaFlow Global Exports Ltd.</div>
+          <div class="profile-meta">GSTIN · 27AAAAA0000A1Z5</div>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <div class="profile-stat-num">87</div>
+          <div class="profile-stat-label">Readiness</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-num">12</div>
+          <div class="profile-stat-label">Docs Generated</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI status -->
+    <div class="ai-status">
+      <div class="ai-status-row">
+        <span class="ai-dot"></span>
+        <strong>AI Engine Live</strong>
+      </div>
+      <div class="ai-status-row" style="color:var(--slate-400);font-size:11px;margin-top:6px;">
+        Provider · Model
+      </div>
+      <div class="ai-status-model">deepseek-v4-flash</div>
+    </div>
+
+    <!-- vault -->
+    <div class="vault">
+      <div class="vault-head">
+        <h3>Recent Documents</h3>
+        <a href="#">View all →</a>
+      </div>
+      <div class="vault-list">
+
+        <div class="vault-item">
+          <div class="vault-thumb proforma">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="vault-info">
+            <div class="vault-name">Proforma · Global Trade Partners</div>
+            <div class="vault-meta"><span class="vault-status"></span> Today · INV-8821</div>
+          </div>
+        </div>
+
+        <div class="vault-item">
+          <div class="vault-thumb hs">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div class="vault-info">
+            <div class="vault-name">HS Code · Wi-Fi Router</div>
+            <div class="vault-meta"><span class="vault-status"></span> Yesterday · 8517.62.00</div>
+          </div>
+        </div>
+
+        <div class="vault-item">
+          <div class="vault-thumb packing">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <div class="vault-info">
+            <div class="vault-name">Packing List · Dubai Shipment</div>
+            <div class="vault-meta"><span class="vault-status"></span> May 28 · 12 CTNS</div>
+          </div>
+        </div>
+
+        <div class="vault-item">
+          <div class="vault-thumb proforma">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="vault-info">
+            <div class="vault-name">Proforma · Berlin Imports GmbH</div>
+            <div class="vault-meta"><span class="vault-status pending"></span> May 25 · Pending review</div>
+          </div>
+        </div>
+
+        <div class="vault-item">
+          <div class="vault-thumb hs">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/></svg>
+          </div>
+          <div class="vault-info">
+            <div class="vault-name">HS Code · Steel Brackets</div>
+            <div class="vault-meta"><span class="vault-status"></span> May 22 · 7308.90.90</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </aside>
+
+</main>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer>
+  <div class="brand">Artha<span class="brand-flow">Flow</span></div>
+  <div>AI-powered export infrastructure for Indian manufacturers</div>
+  <div style="margin-top:14px;">
+    <a href="#">Privacy</a>·<a href="#">Terms</a>·<a href="#">DGFT Compliance</a>·<a href="#">Help</a>
+  </div>
+  <div style="margin-top:14px;color:var(--slate-500);font-size:11px;">
+    © 2026 ArthaFlow Global Exports Ltd. · Made in Mumbai, India 🇮🇳
+  </div>
+</footer>
+
+<script>
+/* ─── Step navigator (demo interactivity) ───────────────────────────────── */
+const STEPS = ['upload','processing','verify','success'];
+function goToStep(target){
+  STEPS.forEach(s=>document.getElementById('state-'+s).classList.add('hidden'));
+  document.getElementById('state-'+target).classList.remove('hidden');
+
+  const idx = STEPS.indexOf(target);
+  document.querySelectorAll('.step').forEach((el,i)=>{
+    el.classList.remove('active','done');
+    if(i<idx) el.classList.add('done');
+    if(i===idx) el.classList.add('active');
+    const num = el.querySelector('.step-num');
+    num.textContent = i<idx ? '✓' : (i+1);
+  });
+
+  /* simulate processing → verify auto-advance */
+  if(target==='processing'){
+    setTimeout(()=>goToStep('verify'), 2400);
+  }
+  window.scrollTo({top:document.querySelector('.app-shell').offsetTop-32,behavior:'smooth'});
+}
+
+/* doc-type tab switching */
+document.querySelectorAll('.doctype-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.doctype-tab').forEach(t=>t.classList.remove('selected'));
+    tab.classList.add('selected');
+  });
+});
+
+/* step click navigation (for demo) */
+document.querySelectorAll('.step').forEach(s=>{
+  s.style.cursor='pointer';
+  s.addEventListener('click', ()=> goToStep(s.dataset.step));
+});
+</script>
+
+</body>
+</html>
